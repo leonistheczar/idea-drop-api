@@ -1,26 +1,115 @@
 import express from "express";
+import mongoose from "mongoose";
+import Idea from "../models/idea.js"
 const router = express.Router();
 // GET
 // @route GET /api/ideas
 // @desc Get all ideas
 // @access Public
-router.get("/", (req,res) => {
-    const ideas = [
-        {id: 1, title: "Ideas 1", description: "Description 1"},
-        {id: 2, title: "Ideas 2", description: "Description 2"},
-        {id: 3, title: "Ideas 3", description: "Description 3"},
-    ]
-    res.status(400);
-    throw new Error("This is an error");
-    res.json(ideas);
+router.get("/", async (req,res, next) => {
+    try {
+        const ideas = await Idea.find(); 
+        res.json(ideas);
+    } catch (err) {
+        console.log(err);
+        next(err);
+    }
+})
+// GET /:id
+// @route GET /api/ideas/:id
+// @desc Get single idea by id
+// @access Public
+router.get("/:id", async (req,res, next) => {
+    try {
+        const { id } = req.params;
+        if(!mongoose.Types.ObjectId.isValid(id)){
+            res.status(404);
+            throw new Error(`Idea with id "${id}" not found`);
+        }
+        const idea = await Idea.findById(id); 
+        if(!idea){
+            res.status(404);
+            throw new Error(`Idea with id "${id}" not found`);
+        }
+        res.json(idea);
+    } catch (err) {
+        console.log(err);
+        next(err);
+    }
 })
 // POST
 // @route POST /api/ideas
 // @desc Add a new idea
 // @access Public
-router.post("/", (req, res) => {
-    const {title, description} = req.body;
-    res.send(`Idea added: ${title} - ${description}`);
-    console.log(title, description);
+router.post("/", async (req, res, next) => {
+    try {        
+        const {title, summary, description, tags} = req.body;
+        if(!title?.trim() || !summary?.trim() || !description?.trim()){
+            res.status(400);
+            throw new Error("Title, summary and description are required");
+        }
+        const newIdea = new Idea({
+            title,
+            summary,
+            description,
+            tags: typeof tags === "string" ? tags.split(",").map((tag) => tag.trim()).filter(Boolean) 
+                  : Array.isArray(tags) ? tags : []
+        })
+        const savedIdea = await newIdea.save();
+        res.status(201).json(savedIdea);
+    } catch (err) {
+        console.log(err);
+        next(err);
+    }
+
+})
+// PUT
+// @route PUT /api/ideas/:id
+// @desc Update an idea by id
+// @access Public
+router.put("/:id", async (req,res, next) => {
+    try {
+        const { id } = req.params;
+        if(!mongoose.Types.ObjectId.isValid(id)){
+            res.status(404);
+            throw new Error(`Idea with id "${id}" not found`);
+        }
+        const {title, summary, description, tags} = req.body;
+        const updatedIdea = await Idea.findByIdAndUpdate(id, {
+            title, summary, description, 
+            tags: typeof tags === "string" ? tags.split(",").map((tag) => tag.trim()).filter(Boolean) 
+            : Array.isArray(tags) ? tags : [] 
+        }, {new: true, runValidators: true}); 
+        if(!updatedIdea){
+            res.status(404);
+            throw new Error(`Idea with id "${id}" not found`);
+        }
+        res.json(updatedIdea);
+    } catch (err) {
+        console.log(err);
+        next(err);
+    }
+})
+// DELETE
+// @route DELETE /api/ideas/:id
+// @desc Delete an idea by id
+// @access Public
+router.delete("/:id", async (req,res, next) => {
+    try {
+        const { id } = req.params;
+        if(!mongoose.Types.ObjectId.isValid(id)){
+            res.status(404);
+            throw new Error(`Idea with id "${id}" not found`);
+        }
+        const idea = await Idea.findByIdAndDelete(id);
+        if(!idea){
+            res.status(404);
+            throw new Error(`Idea with id "${id}" not found`);
+        }
+        res.json({message: `Idea with id "${id}" deleted succesfully` });
+    } catch (err) {
+        console.log(err);
+        next(err);
+    }
 })
 export default router;
