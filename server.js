@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import ideasRoutes from "./routes/ideasRoutes.js";
+import authRoutes from "./routes/authRoutes.js"
+import cookieParser from "cookie-parser";
 import { errorHandler } from "./middleware/errorHandler.js";
 import connectDB from "./config/db.js";
 // DOTENV CONFIG
@@ -15,9 +17,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // ROUTES
 app.use("/api/ideas", ideasRoutes);
+app.use("/api/auth", authRoutes);
 // 404 Fallback
 app.use((req,res, next) => {
     const error = new Error(`Not Found = ${req.originalUrl}`);
