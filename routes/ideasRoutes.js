@@ -60,7 +60,8 @@ router.post("/", protect, async (req, res, next) => {
             summary,
             description,
             tags: typeof tags === "string" ? tags.split(",").map((tag) => tag.trim()).filter(Boolean) 
-                  : Array.isArray(tags) ? tags : []
+                  : Array.isArray(tags) ? tags : [],
+            user: req.user.id
         })
         const savedIdea = await newIdea.save();
         res.status(201).json(savedIdea);
@@ -87,7 +88,7 @@ router.put("/:id", protect, async (req,res, next) => {
             tags: typeof tags === "string" ? tags.split(",").map((tag) => tag.trim()).filter(Boolean) 
             : Array.isArray(tags) 
             ? tags 
-            : [] 
+            : [],
         }, {new: true, runValidators: true}); 
         if(!updatedIdea){
             res.status(404);
@@ -110,11 +111,16 @@ router.delete("/:id", protect, async (req,res, next) => {
             res.status(404);
             throw new Error(`Idea with id "${id}" not found`);
         }
-        const idea = await Idea.findByIdAndDelete(id);
+        const idea = await Idea.findById(id);
         if(!idea){
             res.status(404);
-            throw new Error(`Idea with id "${id}" not found`);
+            throw new Error("Idea not found");
         }
+        if(idea.user.toString() != req.user._id){
+            res.status(403);
+            throw new Error ("Not authorized to DELETE");
+        }
+        await idea.deleteOne();
         res.json({message: `Idea with id "${id}" deleted succesfully` });
     } catch (err) {
         console.log(err);
