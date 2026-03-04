@@ -82,18 +82,27 @@ router.put("/:id", protect, async (req,res, next) => {
             res.status(404);
             throw new Error(`Idea with id "${id}" not found`);
         }
-        const {title, summary, description, tags} = req.body;
-        const updatedIdea = await Idea.findByIdAndUpdate(id, {
-            title, summary, description, 
-            tags: typeof tags === "string" ? tags.split(",").map((tag) => tag.trim()).filter(Boolean) 
-            : Array.isArray(tags) 
-            ? tags 
-            : [],
-        }, {new: true, runValidators: true}); 
-        if(!updatedIdea){
+        const idea = await Idea.findById(id);
+        if(!idea){
             res.status(404);
-            throw new Error(`Idea with id "${id}" not found`);
+            throw new Error("Idea not found");
         }
+        if(idea.user.toString() != req.user._id.toString()){
+            res.status(403);
+            throw new Error ("Not authorized to UPDATE");
+        }
+        const {title, summary, description, tags} = req.body || {};
+        if(!title.trim() || !summary.trim() || !description.trim()){
+            res.status(404);
+            throw new Error("Title, summary, description are required");
+        }
+        idea.title = title;
+        idea.summary = summary;
+        idea.description = description;
+        idea.tags = typeof tags === "string" ? tags.split(",").map((tag) => tag.trim()).filter(Boolean) 
+        : Array.isArray(tags) ? tags : [];
+
+        const updatedIdea = await idea.save();
         res.json(updatedIdea);
     } catch (err) {
         console.log(err);
