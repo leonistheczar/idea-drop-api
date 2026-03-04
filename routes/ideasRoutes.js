@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
-import Idea from "../models/idea.js"
+import Idea from "../models/Idea.js"
+import { protect } from "../middleware/authMiddleware.js"
 const router = express.Router();
 // GET
 // @route       GET /api/ideas
@@ -25,7 +26,7 @@ router.get("/", async (req,res, next) => {
 // @route GET /api/ideas/:id
 // @desc Get single idea by id
 // @access Public
-router.get("/:id", async (req,res, next) => {
+router.get("/:id", protect, async (req,res, next) => {
     try {
         const { id } = req.params;
         if(!mongoose.Types.ObjectId.isValid(id)){
@@ -47,7 +48,7 @@ router.get("/:id", async (req,res, next) => {
 // @route POST /api/ideas
 // @desc Add a new idea
 // @access Public
-router.post("/", async (req, res, next) => {
+router.post("/", protect, async (req, res, next) => {
     try {        
         const {title, summary, description, tags} = req.body;
         if(!title?.trim() || !summary?.trim() || !description?.trim()){
@@ -73,7 +74,7 @@ router.post("/", async (req, res, next) => {
 // @route PUT /api/ideas/:id
 // @desc Update an idea by id
 // @access Public
-router.put("/:id", async (req,res, next) => {
+router.put("/:id", protect, async (req,res, next) => {
     try {
         const { id } = req.params;
         if(!mongoose.Types.ObjectId.isValid(id)){
@@ -84,7 +85,9 @@ router.put("/:id", async (req,res, next) => {
         const updatedIdea = await Idea.findByIdAndUpdate(id, {
             title, summary, description, 
             tags: typeof tags === "string" ? tags.split(",").map((tag) => tag.trim()).filter(Boolean) 
-            : Array.isArray(tags) ? tags : [] 
+            : Array.isArray(tags) 
+            ? tags 
+            : [] 
         }, {new: true, runValidators: true}); 
         if(!updatedIdea){
             res.status(404);
@@ -100,7 +103,7 @@ router.put("/:id", async (req,res, next) => {
 // @route DELETE /api/ideas/:id
 // @desc Delete an idea by id
 // @access Public
-router.delete("/:id", async (req,res, next) => {
+router.delete("/:id", protect, async (req,res, next) => {
     try {
         const { id } = req.params;
         if(!mongoose.Types.ObjectId.isValid(id)){
