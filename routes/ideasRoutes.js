@@ -1,7 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
-import Idea from "../models/Idea.js"
 import { protect } from "../middleware/authMiddleware.js"
+import Idea from "../models/idea.js";
 const router = express.Router();
 // GET
 // @route       GET /api/ideas
