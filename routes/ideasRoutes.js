@@ -26,7 +26,7 @@ router.get("/", async (req,res, next) => {
 // @route GET /api/ideas/:id
 // @desc Get single idea by id
 // @access Public
-router.get("/:id", protect, async (req,res, next) => {
+router.get("/:id", async (req,res, next) => {
     try {
         const { id } = req.params;
         if(!mongoose.Types.ObjectId.isValid(id)){

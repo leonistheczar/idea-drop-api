@@ -114,6 +114,7 @@ router.post("/refresh", async (req, res, next) => {
         user: {
             name: user.name,
             email: user.email,
+            id: user._id.toString(),
         }
     })
 })
@@ -122,12 +123,12 @@ router.post("/refresh", async (req, res, next) => {
 // @desc       Logout the user
 // @access     Private
 router.post("/logout", async (req, res) => {
-  res.clearCookie("refreshToken", refreshToken, {
+  res.clearCookie("refreshToken", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   });
-  res.status(200).json({ message: "Logged out succesfully" });
+
+  res.status(200).json({ message: "Logged out successfully" });
 });
 export default router;
