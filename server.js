@@ -16,6 +16,7 @@ const app = express();
 // Alloed origins
 const allowedOrigins = [
     'http://localhost:3000',
+    'http://localhost:4173',
     'https://idea-drop-api-qgzz.onrender.com/'
 ]
 // MIDDLEWARE
