@@ -116,7 +116,7 @@ Create a `.env` file in the root of the project. This file is listed in `.gitign
 
 ```env
 # Server
-PORT=5000
+PORT=8080
 
 # MongoDB Atlas
 MONGO_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/ideadrop?retryWrites=true&w=majority
@@ -131,7 +131,7 @@ NODE_ENV=development
 
 | Variable | Description |
 |---|---|
-| `PORT` | Port the server listens on (default: `5000`) |
+| `PORT` | Port the server listens on (default: `8080`) |
 | `MONGO_URI` | Your MongoDB Atlas connection string |
 | `JWT_SECRET` | Secret key used to sign JWT tokens |
 | `JWT_EXPIRES_IN` | Token expiry duration (e.g., `7d`, `24h`) |
@@ -149,12 +149,12 @@ npm start
 npm run dev
 ```
 
-The server will start on `http://localhost:5000` (or the port defined in `.env`).
+The server will start on `http://localhost:8080` (or the port defined in `.env`).
 
 You should see:
 ```
 ✅ MongoDB Connected: cluster0.xxxxx.mongodb.net
-🚀 Server running on port 5000
+🚀 Server running on port 8080
 ```
 
 ---
@@ -186,7 +186,7 @@ All routes are prefixed with `/api`. Protected routes require a valid JWT token 
 ### Base URL
 
 ```
-http://localhost:5000/api
+http://localhost:8080/api
 ```
 
 ---
