@@ -17,7 +17,7 @@ const app = express();
 const allowedOrigins = [
     'http://localhost:3000',
     'http://localhost:4173',
-    'https://idea-drop-api-qgzz.onrender.com/'
+    'https://idea-drop-frontend-orcin.vercel.app/'
 ]
 // MIDDLEWARE
 app.use(cookieParser());
